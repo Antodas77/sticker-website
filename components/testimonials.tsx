@@ -2,7 +2,15 @@
 
 import Image from "next/image"
 
-const testimonials = [
+export interface TestimonialData {
+  name: string
+  role: string
+  content: string
+  avatar: string
+}
+
+// Default testimonials for when Sanity data is not available
+const defaultTestimonials: TestimonialData[] = [
   {
     name: "Sarah Chen",
     role: "CEO at TechFlow",
@@ -53,7 +61,7 @@ const testimonials = [
   },
 ]
 
-function TestimonialCard({ testimonial }: { testimonial: (typeof testimonials)[0] }) {
+function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
   return (
     <div className="flex-shrink-0 w-[420px] md:w-[480px] p-8 bg-card border border-border/50 rounded-2xl mx-4 backdrop-blur-sm hover:border-border/80 transition-colors">
       <p className="text-foreground/90 leading-relaxed mb-8 text-[16px] font-normal tracking-tight">
@@ -77,7 +85,13 @@ function TestimonialCard({ testimonial }: { testimonial: (typeof testimonials)[0
   )
 }
 
-export function Testimonials() {
+interface TestimonialsProps {
+  testimonials?: TestimonialData[]
+}
+
+export function Testimonials({ testimonials }: TestimonialsProps) {
+  const testimonialsToShow = testimonials && testimonials.length > 0 ? testimonials : defaultTestimonials
+  
   return (
     <section className="py-24 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 mb-16">
@@ -98,7 +112,7 @@ export function Testimonials() {
       <div className="group">
         <div className="relative">
           <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
-            {[...testimonials, ...testimonials].map((testimonial, index) => (
+            {[...testimonialsToShow, ...testimonialsToShow].map((testimonial, index) => (
               <TestimonialCard key={`testimonial-${index}`} testimonial={testimonial} />
             ))}
           </div>
