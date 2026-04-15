@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { Grid2x2, Linkedin, Twitter } from "lucide-react"
+import { Grid2x2 } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -44,14 +45,20 @@ export function MenuOverlay() {
           </span>
         </Link>
 
-        {/* 40px Dark Square Menu Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-10 h-10 bg-foreground flex items-center justify-center hover:scale-105 transition-transform relative z-50 rounded-2xl"
-          aria-label="Toggle menu"
-        >
-          <Grid2x2 className="w-5 h-5 text-background" />
-        </button>
+        {/* Navigation buttons */}
+        <div className="flex items-center gap-2">
+          {/* Theme Toggle Button */}
+          <ThemeToggle />
+          
+          {/* 40px Dark Square Menu Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-10 h-10 bg-foreground flex items-center justify-center hover:scale-105 transition-transform relative z-50 rounded-2xl"
+            aria-label="Toggle menu"
+          >
+            <Grid2x2 className="w-5 h-5 text-background" />
+          </button>
+        </div>
       </header>
 
       {/* Dropdown Menu */}
@@ -77,7 +84,7 @@ export function MenuOverlay() {
                 duration: 0.3,
                 ease: [0.22, 1, 0.36, 1]
               }}
-              className="fixed top-16 right-6 z-50 bg-white border border-gray-200 rounded-xl p-6 w-56 shadow-xl"
+              className="fixed top-16 right-6 z-50 bg-card border border-border rounded-xl p-6 w-56 shadow-xl"
             >
               {/* Navigation Links */}
               <nav className="space-y-3 mb-6">
@@ -86,7 +93,7 @@ export function MenuOverlay() {
                     {link.href.startsWith("#") ? (
                       <button
                         onClick={() => handleLinkClick(link.href)}
-                        className="block text-sm font-medium text-black hover:text-gray-600 transition-colors w-full text-left"
+                        className="block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors w-full text-left"
                       >
                         {link.label}
                       </button>
@@ -94,7 +101,7 @@ export function MenuOverlay() {
                       <Link
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className="block text-sm font-medium text-black hover:text-gray-600 transition-colors"
+                        className="block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -104,7 +111,7 @@ export function MenuOverlay() {
               </nav>
 
               {/* Divider */}
-              <div className="h-px bg-gray-200 mb-4" />
+              <div className="h-px bg-border mb-4" />
 
               {/* Social Links */}
               <nav className="space-y-2">
@@ -114,7 +121,7 @@ export function MenuOverlay() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-xs text-gray-600 hover:text-black transition-colors"
+                    className="block text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
                   </a>
