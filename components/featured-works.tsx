@@ -3,9 +3,16 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, useMotionValue, useSpring } from "framer-motion"
 import Image from "next/image"
-import Link from "next/link"
 
-const featuredProjects = [
+export interface ProjectData {
+  title: string
+  category: string
+  image: string
+  link: string
+}
+
+// Default projects for when Sanity data is not available
+const defaultProjects: ProjectData[] = [
   {
     title: "Aurora Dashboard",
     category: "Web Application",
@@ -71,7 +78,7 @@ function ProjectCard({
   project,
   onHoverChange
 }: {
-  project: typeof featuredProjects[0]
+  project: ProjectData
   onHoverChange: (isHovered: boolean) => void
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null)
@@ -148,9 +155,14 @@ function ProjectCard({
   )
 }
 
-export function FeaturedWorks() {
+interface FeaturedWorksProps {
+  projects?: ProjectData[]
+}
+
+export function FeaturedWorks({ projects }: FeaturedWorksProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const projectsToShow = projects && projects.length > 0 ? projects : defaultProjects
 
   return (
     <section ref={sectionRef} className="relative px-4 md:px-8 py-24">
@@ -165,7 +177,7 @@ export function FeaturedWorks() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {featuredProjects.map((project, index) => (
+          {projectsToShow.map((project, index) => (
             <div key={index} className="relative">
               <CursorFollower
                 isVisible={hoveredIndex === index}

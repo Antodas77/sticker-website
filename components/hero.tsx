@@ -4,8 +4,33 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import type { HeroData } from "@/lib/sanity"
 
-export function Hero() {
+interface HeroProps {
+  data?: HeroData | null
+}
+
+// Default values for when Sanity data is not available
+const defaults = {
+  heading: "Build Products",
+  headingHighlight: "That Inspire",
+  subheading: "We craft beautiful digital experiences that connect with users and drive results. From concept to launch, we bring your vision to life.",
+  badgeText: "Now accepting new projects",
+  ctaPrimary: "Work with me",
+  ctaPrimaryLink: "#footer",
+  ctaSecondary: "View Projects",
+  ctaSecondaryLink: "/works",
+}
+
+export function Hero({ data }: HeroProps) {
+  const heading = data?.heading || defaults.heading
+  const headingHighlight = data?.headingHighlight || defaults.headingHighlight
+  const subheading = data?.subheading || defaults.subheading
+  const badgeText = data?.badgeText || defaults.badgeText
+  const ctaPrimary = data?.ctaPrimary || defaults.ctaPrimary
+  const ctaPrimaryLink = data?.ctaPrimaryLink || defaults.ctaPrimaryLink
+  const ctaSecondary = data?.ctaSecondary || defaults.ctaSecondary
+  const ctaSecondaryLink = data?.ctaSecondaryLink || defaults.ctaSecondaryLink
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
       {/* Subtle grid background */}
@@ -24,7 +49,7 @@ export function Hero() {
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-sm text-muted-foreground">
-            Now accepting new projects
+            {badgeText}
           </span>
         </motion.div>
 
@@ -34,9 +59,9 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground mb-6 text-balance"
         >
-          Build Products
+          {heading}
           <br />
-          <span className="text-muted-foreground">That Inspire</span>
+          <span className="text-muted-foreground">{headingHighlight}</span>
         </motion.h1>
 
         <motion.p
@@ -45,8 +70,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-pretty"
         >
-          We craft beautiful digital experiences that connect with users and
-          drive results. From concept to launch, we bring your vision to life.
+          {subheading}
         </motion.p>
 
         <motion.div
@@ -56,8 +80,8 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Button asChild size="lg" className="px-8 py-6 text-lg rounded-full">
-            <Link href="#footer">
-              Work with me
+            <Link href={ctaPrimaryLink}>
+              {ctaPrimary}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -67,7 +91,7 @@ export function Hero() {
             size="lg"
             className="px-8 py-6 text-lg rounded-full border-border hover:bg-secondary"
           >
-            <Link href="/works">View Projects</Link>
+            <Link href={ctaSecondaryLink}>{ctaSecondary}</Link>
           </Button>
         </motion.div>
       </div>
