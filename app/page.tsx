@@ -3,7 +3,7 @@ import { FeaturedWorks } from "@/components/featured-works"
 import { Testimonials } from "@/components/testimonials"
 import { Footer } from "@/components/footer"
 import { MenuOverlay } from "@/components/menu-overlay"
-import { getFeaturedProjects, getTestimonials, getHeroData, urlFor } from "@/lib/sanity"
+import { getFeaturedProjects, getTestimonials, getHeroData } from "@/lib/supabase"
 
 export default async function Home() {
   const [featuredProjects, testimonials, heroData] = await Promise.all([
@@ -12,11 +12,11 @@ export default async function Home() {
     getHeroData(),
   ])
 
-  // Transform Sanity data to match component props
+  // Transform Supabase data to match component props
   const projectsData = featuredProjects.map((project) => ({
     title: project.title,
     category: project.category || 'Project',
-    image: project.image ? urlFor(project.image).width(1600).height(1000).url() : '',
+    image: project.image || '',
     link: project.link || '#',
   }))
 
@@ -24,7 +24,7 @@ export default async function Home() {
     name: t.name,
     role: t.role,
     content: t.quote,
-    avatar: t.image ? urlFor(t.image).width(100).height(100).url() : '',
+    avatar: t.image || '',
   }))
 
   return (
