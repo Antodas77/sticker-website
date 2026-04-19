@@ -10,6 +10,15 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { config } from 'dotenv'
+import { resolve } from 'path'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+
+// Load .env.local (Next.js convention — not loaded automatically by Node.js)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+config({ path: resolve(__dirname, '../.env.local') })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
