@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import type { HeroData } from "@/lib/sanity"
+import type { HeroData } from "@/lib/supabase"
 
 interface HeroProps {
   data?: HeroData | null
