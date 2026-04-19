@@ -20,6 +20,7 @@ export interface HeroData {
   ctaPrimaryLink: string
   ctaSecondary: string
   ctaSecondaryLink: string
+  about_image?: string
   created_at: string
   updated_at: string
 }
@@ -30,10 +31,34 @@ export interface Project {
   category: string
   image: string
   link: string
+  description: string
+  year: string
+  role: string
   featured: boolean
   order: number
   created_at: string
   updated_at: string
+}
+
+export interface AboutContent {
+  id: string
+  hero_subtitle: string
+  philosophy_heading: string
+  philosophy_text_1: string
+  philosophy_text_2: string
+  philosophy_text_3: string
+  stat_1_label: string
+  stat_1_value: string
+  stat_2_label: string
+  stat_2_value: string
+  stat_3_label: string
+  stat_3_value: string
+  stat_4_label: string
+  stat_4_value: string
+  services: string
+  location: string
+  founded: string
+  team_size: string
 }
 
 export interface Testimonial {
@@ -83,6 +108,42 @@ export async function getFeaturedProjects(): Promise<Project[]> {
   } catch (error) {
     console.error('Error fetching projects:', error)
     return []
+  }
+}
+
+export async function getAllProjects(): Promise<Project[]> {
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('order', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching all projects:', error)
+      return []
+    }
+    return data || []
+  } catch (error) {
+    console.error('Error fetching all projects:', error)
+    return []
+  }
+}
+
+export async function getAboutContent(): Promise<AboutContent | null> {
+  try {
+    const { data, error } = await supabase
+      .from('about_content')
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Error fetching about content:', error)
+      return null
+    }
+    return data
+  } catch (error) {
+    console.error('Error fetching about content:', error)
+    return null
   }
 }
 

@@ -4,24 +4,75 @@ import { motion } from "framer-motion"
 import { MenuOverlay } from "@/components/menu-overlay"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase"
+import type { AboutContent } from "@/lib/supabase"
 
-const services = [
-  "Brand Identity & Strategy",
-  "UI/UX Design",
-  "Web Development",
-  "Design Systems",
-  "Motion Design",
-  "Creative Direction",
-]
+const DEFAULT_ABOUT: AboutContent = {
+  id: "",
+  hero_subtitle: "Crafting digital experiences that resonate.",
+  philosophy_heading: "Our Philosophy",
+  philosophy_text_1:
+    "We believe that great design is invisible. It guides users naturally, creating experiences that feel intuitive and effortless. Our approach combines strategic thinking with meticulous craftsmanship.",
+  philosophy_text_2:
+    "Founded in 2018, Craft Studio emerged from a simple idea: that digital products should be as thoughtfully designed as the physical objects we cherish. We bring the same care and attention to every pixel, every interaction, and every line of code.",
+  philosophy_text_3:
+    "Our team of designers, developers, and strategists work collaboratively to solve complex challenges. We partner with forward-thinking companies who understand that design is a competitive advantage.",
+  stat_1_label: "Years Experience",
+  stat_1_value: "8+",
+  stat_2_label: "Projects Delivered",
+  stat_2_value: "120+",
+  stat_3_label: "Happy Clients",
+  stat_3_value: "85+",
+  stat_4_label: "Awards Won",
+  stat_4_value: "12",
+  services:
+    "Brand Identity & Strategy,UI/UX Design,Web Development,Design Systems,Motion Design,Creative Direction",
+  location: "San Francisco, CA",
+  founded: "2018",
+  team_size: "12 Creatives",
+}
 
-const stats = [
-  { label: "Years Experience", value: "8+" },
-  { label: "Projects Delivered", value: "120+" },
-  { label: "Happy Clients", value: "85+" },
-  { label: "Awards Won", value: "12" },
-]
+const DEFAULT_ABOUT_IMAGE =
+  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&h=700&fit=crop"
 
 export default function AboutPage() {
+  const [about, setAbout] = useState<AboutContent>(DEFAULT_ABOUT)
+  const [aboutImage, setAboutImage] = useState(DEFAULT_ABOUT_IMAGE)
+
+  useEffect(() => {
+    // Fetch about page text
+    supabase
+      .from("about_content")
+      .select("*")
+      .single()
+      .then(({ data }) => {
+        if (data) setAbout(data as AboutContent)
+      })
+
+    // Fetch about image from hero_content
+    supabase
+      .from("hero_content")
+      .select("about_image")
+      .single()
+      .then(({ data }) => {
+        if (data?.about_image) setAboutImage(data.about_image)
+      })
+  }, [])
+
+  const stats = [
+    { label: about.stat_1_label, value: about.stat_1_value },
+    { label: about.stat_2_label, value: about.stat_2_value },
+    { label: about.stat_3_label, value: about.stat_3_value },
+    { label: about.stat_4_label, value: about.stat_4_value },
+  ]
+
+  // Services are stored as comma-separated or newline-separated
+  const services = about.services
+    .split(/,|\n/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+
   return (
     <main className="min-h-screen">
       <MenuOverlay />
@@ -38,7 +89,7 @@ export default function AboutPage() {
             About
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
-            Crafting digital experiences that resonate.
+            {about.hero_subtitle}
           </p>
         </motion.div>
       </section>
@@ -53,7 +104,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-card">
             <Image
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&h=700&fit=crop"
+              src={aboutImage}
               alt="Our team collaborating"
               fill
               className="object-cover"
@@ -74,29 +125,16 @@ export default function AboutPage() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
-                Our Philosophy
+                {about.philosophy_heading}
               </h2>
               <div className="space-y-6 text-muted-foreground leading-relaxed text-lg">
-                <p>
-                  We believe that great design is invisible. It guides users naturally,
-                  creating experiences that feel intuitive and effortless. Our approach
-                  combines strategic thinking with meticulous craftsmanship.
-                </p>
-                <p>
-                  Founded in 2018, Craft Studio emerged from a simple idea: that digital
-                  products should be as thoughtfully designed as the physical objects we
-                  cherish. We bring the same care and attention to every pixel, every
-                  interaction, and every line of code.
-                </p>
-                <p>
-                  Our team of designers, developers, and strategists work collaboratively
-                  to solve complex challenges. We partner with forward-thinking companies
-                  who understand that design is a competitive advantage.
-                </p>
+                <p>{about.philosophy_text_1}</p>
+                <p>{about.philosophy_text_2}</p>
+                <p>{about.philosophy_text_3}</p>
               </div>
             </motion.div>
 
-            {/* Stats / Social Proof */}
+            {/* Stats */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -126,7 +164,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Services / Expertise Section */}
+      {/* Services */}
       <section className="px-6 md:px-12 py-20 border-t border-border">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -137,7 +175,7 @@ export default function AboutPage() {
             className="mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Services & Expertise
+              Services &amp; Expertise
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl">
               We offer end-to-end creative services tailored to your needs.
@@ -159,7 +197,7 @@ export default function AboutPage() {
                     {service}
                   </p>
                   <span className="text-muted-foreground text-sm">
-                    0{index + 1}
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                 </div>
               </motion.div>
@@ -179,9 +217,7 @@ export default function AboutPage() {
               transition={{ duration: 0.5 }}
             >
               <p className="text-sm text-muted-foreground mb-2">Location</p>
-              <p className="text-xl font-medium text-foreground">
-                San Francisco, CA
-              </p>
+              <p className="text-xl font-medium text-foreground">{about.location}</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -190,7 +226,7 @@ export default function AboutPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <p className="text-sm text-muted-foreground mb-2">Founded</p>
-              <p className="text-xl font-medium text-foreground">2018</p>
+              <p className="text-xl font-medium text-foreground">{about.founded}</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -199,7 +235,7 @@ export default function AboutPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <p className="text-sm text-muted-foreground mb-2">Team Size</p>
-              <p className="text-xl font-medium text-foreground">12 Creatives</p>
+              <p className="text-xl font-medium text-foreground">{about.team_size}</p>
             </motion.div>
           </div>
         </div>

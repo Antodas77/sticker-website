@@ -63,12 +63,17 @@ const defaultTestimonials: TestimonialData[] = [
 
 function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
   return (
-    <div className="flex-shrink-0 w-[420px] md:w-[480px] p-8 bg-card border border-border/50 rounded-2xl mx-4 backdrop-blur-sm hover:border-border/80 transition-colors">
-      <p className="text-foreground/90 leading-relaxed mb-8 text-[16px] font-normal tracking-tight">
-        &ldquo;{testimonial.content}&rdquo;
-      </p>
-      <div className="flex items-center gap-4">
-        <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-border/30">
+    <div className="flex-shrink-0 w-[420px] md:w-[500px] p-8 md:p-10 bg-card border border-border/40 rounded-[2rem] mx-4 hover:border-foreground/20 hover:shadow-lg hover:shadow-black/5 transition-all duration-300">
+      {/* Highlighted Quote area */}
+      <div className="relative mb-10">
+        <span className="absolute -top-4 -left-2 text-6xl text-foreground/10 select-none">"</span>
+        <blockquote className="relative z-10 text-xl md:text-2xl font-serif italic text-foreground tracking-tight leading-snug">
+          {testimonial.content}
+        </blockquote>
+      </div>
+
+      <div className="flex items-center gap-4 mt-auto">
+        <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
           <Image
             src={testimonial.avatar}
             alt={testimonial.name}
@@ -76,9 +81,13 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
             className="object-cover"
           />
         </div>
-        <div>
-          <p className="font-semibold text-foreground text-[15px] tracking-tight">{testimonial.name}</p>
-          <p className="text-sm text-muted-foreground font-normal">{testimonial.role}</p>
+        <div className="flex flex-col">
+          <p className="font-semibold text-foreground text-lg tracking-tight leading-none mb-1.5">
+            {testimonial.name}
+          </p>
+          <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+            {testimonial.role}
+          </p>
         </div>
       </div>
     </div>

@@ -9,9 +9,10 @@ export interface ProjectData {
   category: string
   image: string
   link: string
+  role?: string
 }
 
-// Default projects for when Sanity data is not available
+// Default projects for when data is not available
 const defaultProjects: ProjectData[] = [
   {
     title: "Aurora Dashboard",
@@ -76,9 +77,11 @@ function CursorFollower({ isVisible, containerRef }: { isVisible: boolean; conta
 
 function ProjectCard({
   project,
+  index,
   onHoverChange
 }: {
   project: ProjectData
+  index: number
   onHoverChange: (isHovered: boolean) => void
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null)
@@ -132,24 +135,31 @@ function ProjectCard({
         </motion.div>
       </div>
 
-      {/* Minimalist text label */}
-      <div className="mt-6 flex items-end justify-between">
-        <div>
-          <h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-accent transition-colors">
+      {/* Minimalist text label container */}
+      <div className="mt-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
+        {/* Left Side: Number + Title */}
+        <div className="flex gap-4 md:gap-8 items-baseline">
+          <span className="text-sm font-medium text-muted-foreground tabular-nums">
+            Project {String(index + 1).padStart(2, '0')}
+          </span>
+          <h3 className="text-2xl md:text-4xl font-semibold text-foreground group-hover:text-accent transition-colors tracking-tight">
             {project.title}
           </h3>
-          <p className="mt-1 text-muted-foreground text-sm md:text-base">
-            {project.category}
-          </p>
         </div>
-        {/* Arrow icon */}
-        <motion.div
-          animate={{ x: isHovered ? 4 : 0, y: isHovered ? -4 : 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-foreground text-xl"
-        >
-          ↗
-        </motion.div>
+        
+        {/* Right Side: Role/Type + Arrow */}
+        <div className="flex items-center gap-6 justify-between w-full md:w-auto">
+          <p className="text-muted-foreground text-sm md:text-base font-medium">
+            {project.role || project.category}
+          </p>
+          <motion.div
+            animate={{ x: isHovered ? 4 : 0, y: isHovered ? -4 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-foreground text-xl"
+          >
+            ↗
+          </motion.div>
+        </div>
       </div>
     </motion.a>
   )
@@ -185,6 +195,7 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
               />
               <ProjectCard
                 project={project}
+                index={index}
                 onHoverChange={(isHovered) => setHoveredIndex(isHovered ? index : null)}
               />
             </div>
