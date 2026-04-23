@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Mail, Image as ImageIcon } from "lucide-react"
+import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Mail, Image as ImageIcon, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -129,6 +129,12 @@ export default function AdminDashboardPage() {
             description: "Update the headline, CTA buttons and badge text.",
             href: "/admin/hero",
             icon: Zap,
+          },
+          {
+            title: "Edit About Page",
+            description: "Customize content, images, and resume on the About page.",
+            href: "/admin/about",
+            icon: FileText,
           },
           {
             title: "Customize Footer",
