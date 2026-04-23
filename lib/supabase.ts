@@ -59,6 +59,7 @@ export interface AboutContent {
   location: string
   founded: string
   team_size: string
+  resume_url?: string
 }
 
 export interface Testimonial {

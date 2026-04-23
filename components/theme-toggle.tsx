@@ -17,6 +17,7 @@ export function ThemeToggle() {
       <button
         className="w-10 h-10 bg-secondary flex items-center justify-center rounded-2xl transition-all duration-300"
         aria-label="Toggle theme"
+        suppressHydrationWarning
       >
         <div className="w-5 h-5" />
       </button>
@@ -30,6 +31,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="w-10 h-10 bg-secondary hover:bg-accent flex items-center justify-center hover:scale-105 transition-all duration-300 rounded-2xl"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      suppressHydrationWarning
     >
       {isDark ? (
         <Sun className="w-5 h-5 text-foreground transition-transform duration-300" />

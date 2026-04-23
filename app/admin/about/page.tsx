@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Save, Info } from "lucide-react"
+import { Save, Info, FileText } from "lucide-react"
+import { FileUploader } from "@/components/admin/file-uploader"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 import { ImageUploader } from "@/components/admin/image-uploader"
@@ -30,23 +31,24 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 
 const aboutSchema = z.object({
-  hero_subtitle: z.string().min(1, "Required"),
+  hero_subtitle: z.string().optional(),
   philosophy_heading: z.string().min(1, "Required"),
   philosophy_text_1: z.string().min(1, "Required"),
   philosophy_text_2: z.string().min(1, "Required"),
   philosophy_text_3: z.string().min(1, "Required"),
-  stat_1_label: z.string().min(1, "Required"),
-  stat_1_value: z.string().min(1, "Required"),
-  stat_2_label: z.string().min(1, "Required"),
-  stat_2_value: z.string().min(1, "Required"),
-  stat_3_label: z.string().min(1, "Required"),
-  stat_3_value: z.string().min(1, "Required"),
-  stat_4_label: z.string().min(1, "Required"),
-  stat_4_value: z.string().min(1, "Required"),
+  stat_1_label: z.string().optional(),
+  stat_1_value: z.string().optional(),
+  stat_2_label: z.string().optional(),
+  stat_2_value: z.string().optional(),
+  stat_3_label: z.string().optional(),
+  stat_3_value: z.string().optional(),
+  stat_4_label: z.string().optional(),
+  stat_4_value: z.string().optional(),
   services: z.string().min(1, "Required"),
-  location: z.string().min(1, "Required"),
-  founded: z.string().min(1, "Required"),
-  team_size: z.string().min(1, "Required"),
+  location: z.string().optional(),
+  founded: z.string().optional(),
+  team_size: z.string().optional(),
+  resume_url: z.string().optional(),
 })
 
 type AboutFormValues = z.infer<typeof aboutSchema>
@@ -55,6 +57,7 @@ export default function AdminAboutPage() {
   const [rowId, setRowId] = useState<string | null>(null)
   const [heroRowId, setHeroRowId] = useState<string | null>(null)
   const [aboutImage, setAboutImage] = useState("")
+  const [resumeUrl, setResumeUrl] = useState("")
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -78,6 +81,7 @@ export default function AdminAboutPage() {
       location: "",
       founded: "",
       team_size: "",
+      resume_url: "",
     },
   })
 
@@ -107,7 +111,9 @@ export default function AdminAboutPage() {
           location: data.location,
           founded: data.founded,
           team_size: data.team_size,
+          resume_url: data.resume_url ?? "",
         })
+        setResumeUrl(data.resume_url ?? "")
       }
 
       // Fetch about image from hero_content
@@ -131,7 +137,7 @@ export default function AdminAboutPage() {
     setSaving(true)
     const { error: textError } = await supabase
       .from("about_content")
-      .update({ ...values, updated_at: new Date().toISOString() })
+      .update({ ...values, resume_url: resumeUrl, updated_at: new Date().toISOString() })
       .eq("id", rowId)
 
     if (heroRowId && aboutImage) {
@@ -229,34 +235,11 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
-          {/* Hero */}
+          {/* Main Content */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Hero</CardTitle>
-              <CardDescription>The tagline shown under the "About" heading.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="hero_subtitle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subtitle</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Crafting digital experiences that resonate." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Philosophy */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Philosophy Section</CardTitle>
-              <CardDescription>The left-column text block on the About page.</CardDescription>
+              <CardTitle className="text-base">Main Content ("Behind the Work")</CardTitle>
+              <CardDescription>The main heading and introductory paragraphs.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -264,9 +247,9 @@ export default function AdminAboutPage() {
                 name="philosophy_heading"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Heading</FormLabel>
+                    <FormLabel>Main Heading</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="BEHIND THE WORK" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -280,7 +263,7 @@ export default function AdminAboutPage() {
                     name={name}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Paragraph {i + 1}</FormLabel>
+                        <FormLabel>Body Paragraph {i + 1}</FormLabel>
                         <FormControl>
                           <Textarea className={textareaClass} {...field} />
                         </FormControl>
@@ -293,55 +276,78 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
-          {/* Stats */}
+          {/* Approach */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Stats</CardTitle>
-              <CardDescription>The 4 highlight numbers shown on the right side.</CardDescription>
+              <CardTitle className="text-base">Approach Section</CardTitle>
+              <CardDescription>Three paragraphs and a highlight element for the approach section.</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              {([
-                ["stat_1_value", "stat_1_label"],
-                ["stat_2_value", "stat_2_label"],
-                ["stat_3_value", "stat_3_label"],
-                ["stat_4_value", "stat_4_label"],
-              ] as const).map(([valueKey, labelKey], i) => (
-                <div key={i} className="space-y-3 rounded-lg border border-border p-4">
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Approach Paragraph 1</FormLabel>
+                    <FormControl>
+                      <Textarea className={textareaClass} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="founded"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Approach Paragraph 2</FormLabel>
+                    <FormControl>
+                      <Textarea className={textareaClass} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="team_size"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Approach Paragraph 3</FormLabel>
+                    <FormControl>
+                      <Textarea className={textareaClass} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="space-y-3 rounded-lg border border-border p-4 col-span-1 md:col-span-2">
+                  <p className="font-medium text-sm mb-2">Highlight Element</p>
                   <FormField
                     control={form.control}
-                    name={valueKey}
+                    name="stat_1_value"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Value</FormLabel>
+                        <FormLabel>Highlight Text</FormLabel>
                         <FormControl>
-                          <Input placeholder="8+" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={labelKey}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Years Experience" {...field} />
+                          <Input placeholder="4+ Years Experience" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              ))}
+              </div>
             </CardContent>
           </Card>
 
           {/* Services */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Services & Expertise</CardTitle>
+              <CardTitle className="text-base">Service & Expertise</CardTitle>
               <CardDescription>
                 List your services. One per line.
               </CardDescription>
@@ -356,12 +362,12 @@ export default function AdminAboutPage() {
                     <FormControl>
                       <Textarea
                         className="min-h-[140px] resize-none font-mono text-sm"
-                        placeholder={"Brand Identity & Strategy\nUI/UX Design\nWeb Development"}
+                        placeholder={"Visual Identity\nCreative Direction\nLogo Design"}
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      Each line will appear as a separate service card.
+                      Each line will appear as an item in the service list.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -370,51 +376,34 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
-          {/* Studio Info */}
+          {/* Resume */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Studio Info</CardTitle>
-              <CardDescription>Displayed in the footer strip at the bottom of the About page.</CardDescription>
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Resume / CV
+              </CardTitle>
+              <CardDescription>
+                Upload your PDF resume or paste a public link. A &quot;View PDF&quot; button will appear on the public About page.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input placeholder="San Francisco, CA" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="founded"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Founded</FormLabel>
-                    <FormControl>
-                      <Input placeholder="2018" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="team_size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team Size</FormLabel>
-                    <FormControl>
-                      <Input placeholder="12 Creatives" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <CardContent>
+              <FileUploader
+                value={resumeUrl}
+                onChange={async (url) => {
+                  setResumeUrl(url)
+                  if (rowId) {
+                    await supabase
+                      .from("about_content")
+                      .update({ resume_url: url, updated_at: new Date().toISOString() })
+                      .eq("id", rowId)
+                    toast.success(url ? "Resume saved!" : "Resume removed")
+                  }
+                }}
+                bucket="images"
+                folder="documents"
+                accept="application/pdf"
+                label="Resume"
               />
             </CardContent>
           </Card>

@@ -55,6 +55,7 @@ export function MenuOverlay() {
             onClick={() => setIsOpen(!isOpen)}
             className="w-10 h-10 bg-foreground flex items-center justify-center hover:scale-105 transition-transform relative z-50 rounded-2xl"
             aria-label="Toggle menu"
+            suppressHydrationWarning
           >
             <Grid2x2 className="w-5 h-5 text-background" />
           </button>
