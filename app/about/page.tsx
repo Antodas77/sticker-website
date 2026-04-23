@@ -274,7 +274,8 @@ function ResumeSection({ resumeUrl }: { resumeUrl: string }) {
             </button>
             <a
               href={resumeUrl}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Download className="h-4 w-4" />
