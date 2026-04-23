@@ -1,12 +1,135 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { MenuOverlay } from "@/components/menu-overlay"
 import Link from "next/link"
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion"
+import { motion, AnimatePresence, LayoutGroup, useMotionValue, useSpring } from "framer-motion"
 import { getAllProjects } from "@/lib/supabase"
 import type { Project } from "@/lib/supabase"
+
+function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: React.RefObject<HTMLElement | null> }) {
+  const cursorX = useMotionValue(0)
+  const cursorY = useMotionValue(0)
+
+  const springConfig = { damping: 25, stiffness: 300 }
+  const cursorXSpring = useSpring(cursorX, springConfig)
+  const cursorYSpring = useSpring(cursorY, springConfig)
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect()
+        cursorX.set(e.clientX - rect.left)
+        cursorY.set(e.clientY - rect.top)
+      }
+    }
+
+    const card = cardRef.current
+    if (card) {
+      card.addEventListener("mousemove", handleMouseMove)
+      return () => card.removeEventListener("mousemove", handleMouseMove)
+    }
+  }, [cardRef, cursorX, cursorY])
+
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+      style={{
+        borderRadius: "16px",
+      }}
+    >
+      <motion.div
+        className="flex items-center justify-center rounded-full bg-foreground px-4 py-2"
+        style={{
+          x: cursorXSpring,
+          y: cursorYSpring,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{
+          scale: isVisible ? 1 : 0,
+          opacity: isVisible ? 1 : 0
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        <span className="text-sm font-medium text-background whitespace-nowrap">
+          View Project
+        </span>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function ProjectCardWrapper({ project }: { project: Project }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <div
+      ref={cardRef}
+      className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-none transition-colors duration-300 hover:border-muted-foreground/50"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <CursorFollower
+        isVisible={isHovered}
+        cardRef={cardRef}
+      />
+      
+      <a
+        href={project.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        {/* Project Image */}
+        <div className="aspect-[4/3] relative overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <motion.img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              ;(e.target as HTMLImageElement).src =
+                "https://placehold.co/800x600/1a1a1a/444?text=No+Image"
+            }}
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-card/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+          {/* Category badge */}
+          <div className="absolute bottom-4 left-4">
+            <span className="px-3 py-1.5 text-xs font-medium bg-background/90 backdrop-blur-sm text-foreground rounded-full">
+              {project.category}
+            </span>
+          </div>
+        </div>
+
+        {/* Project Info */}
+        <div className="p-6">
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-foreground/80 transition-colors">
+              {project.title}
+            </h3>
+            {project.year && (
+              <span className="text-sm text-muted-foreground shrink-0 tabular-nums">
+                {project.year}
+              </span>
+            )}
+          </div>
+          {project.description && (
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {project.description}
+            </p>
+          )}
+        </div>
+      </a>
+    </div>
+  )
+}
 
 export default function WorksPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -146,61 +269,8 @@ export default function WorksPage() {
                         damping: 30,
                       },
                     }}
-                    className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-colors duration-300 hover:border-muted-foreground/50"
                   >
-                    {/* Project Image */}
-                    <div className="aspect-[4/3] relative overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <motion.img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        onError={(e) => {
-                          ;(e.target as HTMLImageElement).src =
-                            "https://placehold.co/800x600/1a1a1a/444?text=No+Image"
-                        }}
-                      />
-
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-card/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                      {/* Arrow icon */}
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ArrowUpRight className="w-5 h-5 text-foreground" />
-                      </a>
-
-                      {/* Category badge */}
-                      <div className="absolute bottom-4 left-4">
-                        <span className="px-3 py-1.5 text-xs font-medium bg-background/90 backdrop-blur-sm text-foreground rounded-full">
-                          {project.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Project Info */}
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <h3 className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-foreground/80 transition-colors">
-                          {project.title}
-                        </h3>
-                        {project.year && (
-                          <span className="text-sm text-muted-foreground shrink-0 tabular-nums">
-                            {project.year}
-                          </span>
-                        )}
-                      </div>
-                      {project.description && (
-                        <p className="text-muted-foreground text-sm leading-relaxed">
-                          {project.description}
-                        </p>
-                      )}
-                    </div>
+                    <ProjectCardWrapper project={project} />
                   </motion.article>
                 ))}
               </AnimatePresence>
