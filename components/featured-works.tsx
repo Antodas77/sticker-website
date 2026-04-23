@@ -54,7 +54,7 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
 
   return (
     <motion.div
-      className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+      className="pointer-events-none absolute inset-0 z-50"
       style={{
         borderRadius: "32px",
       }}
