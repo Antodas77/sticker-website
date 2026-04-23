@@ -4,9 +4,8 @@ import { motion } from "framer-motion"
 import { MenuOverlay } from "@/components/menu-overlay"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
-import { useEffect, useState, useCallback } from "react"
-import { ArrowUpRight, X, Download, ExternalLink, FileText } from "lucide-react"
-import { AnimatePresence } from "framer-motion"
+import { useEffect, useState } from "react"
+import { Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { AboutContent } from "@/lib/supabase"
 
@@ -202,192 +201,35 @@ export default function AboutPage() {
   )
 }
 
-/* ─── Inline PDF Preview Component (cross-platform) ────────────── */
+/* ─── PDF Download Component (opens in new tab) ────────────── */
 function ResumeSection({ resumeUrl }: { resumeUrl: string }) {
-  const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [iframeLoaded, setIframeLoaded] = useState(false)
-
-  // Detect mobile / iOS (iOS Safari can't render PDFs in iframes natively)
-  useEffect(() => {
-    const ua = navigator.userAgent
-    const mobile =
-      /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(ua) ||
-      window.innerWidth < 768
-    setIsMobile(mobile)
-  }, [])
-
-  // Reset iframe loaded state each time modal opens
-  useEffect(() => {
-    if (open) {
-      setIframeLoaded(false)
-    }
-  }, [open])
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => { document.body.style.overflow = "" }
-  }, [open])
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") setOpen(false)
-  }, [])
-
-  useEffect(() => {
-    if (open) window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [open, handleKeyDown])
-
-  // Desktop: native browser PDF renderer (fast, full toolbar)
-  // Mobile: Google Docs Viewer (works on iOS Safari, Android, all mobile browsers)
-  const iframeSrc = isMobile
-    ? `https://docs.google.com/gview?url=${encodeURIComponent(resumeUrl)}&embedded=true`
-    : `${resumeUrl}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`
+  const handleDownload = () => {
+    window.open(resumeUrl, "_blank")
+  }
 
   return (
-    <>
-      {/* Trigger strip */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        className="px-6 md:px-12 py-16 border-t border-border"
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground font-medium mb-4">
-            Resume
-          </p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <span className="text-lg font-medium text-foreground">See CV</span>
-            <button
-              onClick={() => setOpen(true)}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-sm font-medium hover:opacity-80 transition-opacity"
-            >
-              <FileText className="h-4 w-4" />
-              View PDF
-            </button>
-            <a
-              href={resumeUrl}
-              download
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </a>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Full-screen PDF Modal */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="pdf-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-background"
+    <motion.section
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="px-6 md:px-12 py-16 border-t border-border"
+    >
+      <div className="max-w-6xl mx-auto">
+        <p className="text-sm uppercase tracking-widest text-muted-foreground font-medium mb-4">
+          Resume
+        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <span className="text-lg font-medium text-foreground">See CV</span>
+          <button
+            onClick={handleDownload}
+            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-sm font-medium hover:opacity-80 transition-opacity"
           >
-            {/* Top bar */}
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.25, delay: 0.05 }}
-              className="flex items-center justify-between px-4 py-3 border-b border-border bg-background shrink-0"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                  <FileText className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">
-                  Resume / CV
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1 sm:gap-2">
-                {/* Download — always visible */}
-                <a
-                  href={resumeUrl}
-                  download
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Download</span>
-                </a>
-                {/* Open in tab */}
-                <a
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Open tab</span>
-                </a>
-                {/* Close */}
-                <button
-                  onClick={() => setOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  aria-label="Close preview"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Viewer area */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.3, delay: 0.08 }}
-              className="relative flex-1 overflow-hidden bg-muted/20"
-            >
-              {/* Loading spinner — shown until iframe fires onLoad */}
-              {!iframeLoaded && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background z-10">
-                  <div className="h-8 w-8 rounded-full border-2 border-muted border-t-primary animate-spin" />
-                  <p className="text-sm text-muted-foreground">Loading PDF…</p>
-                </div>
-              )}
-
-              <iframe
-                key={iframeSrc}
-                src={iframeSrc}
-                title="Resume PDF Preview"
-                className="w-full h-full border-0"
-                allow="fullscreen"
-                onLoad={() => setIframeLoaded(true)}
-              />
-            </motion.div>
-
-            {/* Mobile hint bar */}
-            {isMobile && (
-              <div className="shrink-0 px-4 py-2 border-t border-border bg-muted/30 text-center">
-                <p className="text-xs text-muted-foreground">
-                  Having trouble viewing?{" "}
-                  <a
-                    href={resumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline underline-offset-2 hover:text-foreground transition-colors"
-                  >
-                    Open PDF in browser
-                  </a>
-                </p>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+            <Download className="h-4 w-4" />
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </motion.section>
   )
 }

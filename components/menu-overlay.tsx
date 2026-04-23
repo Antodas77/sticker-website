@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { Grid2x2 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { getFooterSettings, FooterSettings } from "@/lib/supabase"
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -20,6 +21,15 @@ const socialLinks = [
 
 export function MenuOverlay() {
   const [isOpen, setIsOpen] = useState(false)
+  const [settings, setSettings] = useState<FooterSettings | null>(null)
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const data = await getFooterSettings()
+      setSettings(data)
+    }
+    fetchSettings()
+  }, [])
 
   const handleLinkClick = (href: string) => {
     setIsOpen(false)
@@ -31,17 +41,24 @@ export function MenuOverlay() {
     }
   }
 
+  const studioName = settings?.studio_name || "Craft Studio"
+  const studioLogo = settings?.studio_logo_url
+
   return (
     <>
       {/* Fixed Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-5">
         {/* Minimalist Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-foreground flex items-center justify-center rounded-sm">
-            <span className="text-background font-bold text-xs">CS</span>
-          </div>
+          {studioLogo ? (
+            <img src={studioLogo} alt={studioName} className="w-8 h-8 rounded-sm object-cover" />
+          ) : (
+            <div className="w-8 h-8 bg-foreground flex items-center justify-center rounded-sm">
+              <span className="text-background font-bold text-xs">CS</span>
+            </div>
+          )}
           <span className="text-sm font-medium text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            Craft Studio
+            {studioName}
           </span>
         </Link>
 

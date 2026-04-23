@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp } from "lucide-react"
+import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Mail, Image as ImageIcon } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -129,6 +129,18 @@ export default function AdminDashboardPage() {
             description: "Update the headline, CTA buttons and badge text.",
             href: "/admin/hero",
             icon: Zap,
+          },
+          {
+            title: "Customize Footer",
+            description: "Edit studio name, bio, email, location and social links.",
+            href: "/admin/footer",
+            icon: Mail,
+          },
+          {
+            title: "Customize Craft Studio",
+            description: "Update the craft studio section image/gif and description.",
+            href: "/admin/craft-studio",
+            icon: ImageIcon,
           },
         ].map((action) => (
           <Card key={action.href} className="group hover:border-primary/50 transition-colors">

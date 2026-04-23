@@ -1,15 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Linkedin, Twitter, Instagram, Github } from "lucide-react"
 import Link from "next/link"
-
-const socialLinks = [
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter/X" },
-  { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-]
+import { getFooterSettings, FooterSettings } from "@/lib/supabase"
 
 export function Footer() {
   const [formData, setFormData] = useState({
@@ -17,12 +11,50 @@ export function Footer() {
     email: "",
     message: "",
   })
+  const [settings, setSettings] = useState<FooterSettings | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const data = await getFooterSettings()
+      setSettings(data)
+      setIsLoading(false)
+    }
+    fetchSettings()
+  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Form submitted:", formData)
     setFormData({ name: "", email: "", message: "" })
   }
+
+  if (isLoading) {
+    return (
+      <footer id="footer" className="px-6 md:px-12 py-20 border-t border-border">
+        <div className="max-w-6xl mx-auto">Loading footer...</div>
+      </footer>
+    )
+  }
+
+  const {
+    studio_name = 'Craft Studio',
+    studio_bio = '',
+    studio_email = '',
+    studio_location = '',
+    studio_logo_url = '',
+    linkedin_url = '',
+    twitter_url = '',
+    instagram_url = '',
+    github_url = ''
+  } = settings || {}
+
+  const socialLinks = [
+    { icon: Linkedin, href: linkedin_url || "https://linkedin.com", label: "LinkedIn" },
+    { icon: Twitter, href: twitter_url || "https://twitter.com", label: "Twitter/X" },
+    { icon: Instagram, href: instagram_url || "https://instagram.com", label: "Instagram" },
+    { icon: Github, href: github_url || "https://github.com", label: "GitHub" },
+  ]
 
   return (
     <footer id="footer" className="px-6 md:px-12 py-20 border-t border-border">
@@ -36,51 +68,62 @@ export function Footer() {
           {/* Left Column - Bio & Social Links */}
           <div className="flex flex-col gap-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-sm">CS</span>
-              </div>
+              {studio_logo_url ? (
+                <img
+                  src={studio_logo_url}
+                  alt={studio_name}
+                  className="w-10 h-10 rounded object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-foreground flex items-center justify-center rounded">
+                  <span className="text-background font-bold text-sm">CS</span>
+                </div>
+              )}
               <span className="text-xl font-semibold text-foreground">
-                Craft Studio
+                {studio_name}
               </span>
             </div>
 
             <p className="text-muted-foreground leading-relaxed max-w-md">
-              We are a design-driven studio focused on creating meaningful
-              digital experiences. Our work spans brand identity, web design,
-              and interactive products that connect with people on a deeper
-              level.
+              {studio_bio}
             </p>
 
             {/* Primary Contact - Direct Email Link */}
-            <a
-              href="mailto:hello@craftstudio.com"
-              className="text-2xl md:text-3xl font-semibold text-foreground hover:text-muted-foreground transition-colors"
-            >
-              hello@craftstudio.com
-            </a>
+            {studio_email && (
+              <a
+                href={`mailto:${studio_email}`}
+                className="text-2xl md:text-3xl font-semibold text-foreground hover:text-muted-foreground transition-colors"
+              >
+                {studio_email}
+              </a>
+            )}
 
-            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <p>San Francisco, California</p>
-            </div>
+            {studio_location && (
+              <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+                <p>{studio_location}</p>
+              </div>
+            )}
 
             {/* Social Links */}
             <div className="flex items-center gap-4 pt-4">
               {socialLinks.map((social) => (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-4 h-4" />
-                </Link>
+                social.href && (
+                  <Link
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                    aria-label={social.label}
+                  >
+                    <social.icon className="w-4 h-4" />
+                  </Link>
+                )
               ))}
             </div>
 
             <p className="text-sm text-muted-foreground mt-auto pt-8">
-              © 2026 Craft Studio. All rights reserved.
+              © 2026 {studio_name}. All rights reserved.
             </p>
           </div>
 

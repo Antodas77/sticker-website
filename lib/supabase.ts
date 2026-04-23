@@ -74,6 +74,30 @@ export interface Testimonial {
   updated_at: string
 }
 
+export interface FooterSettings {
+  id: string
+  studio_name: string
+  studio_bio: string
+  studio_email: string
+  studio_location: string
+  studio_logo_url: string
+  linkedin_url: string
+  twitter_url: string
+  instagram_url: string
+  github_url: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CraftStudioSettings {
+  id: string
+  image_url: string
+  title: string
+  description: string
+  created_at: string
+  updated_at: string
+}
+
 // Data fetching functions
 export async function getHeroData(): Promise<HeroData | null> {
   try {
@@ -164,5 +188,79 @@ export async function getTestimonials(): Promise<Testimonial[]> {
   } catch (error) {
     console.error('Error fetching testimonials:', error)
     return []
+  }
+}
+
+export async function getFooterSettings(): Promise<FooterSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('footer_settings')
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Error fetching footer settings:', error)
+      return null
+    }
+    return data
+  } catch (error) {
+    console.error('Error fetching footer settings:', error)
+    return null
+  }
+}
+
+export async function updateFooterSettings(updates: Partial<FooterSettings>): Promise<FooterSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('footer_settings')
+      .update(updates)
+      .single()
+      .select('*')
+
+    if (error) {
+      console.error('Error updating footer settings:', error)
+      return null
+    }
+    return data
+  } catch (error) {
+    console.error('Error updating footer settings:', error)
+    return null
+  }
+}
+
+export async function getCraftStudioSettings(): Promise<CraftStudioSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('craft_studio_settings')
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Error fetching craft studio settings:', error)
+      return null
+    }
+    return data
+  } catch (error) {
+    console.error('Error fetching craft studio settings:', error)
+    return null
+  }
+}
+
+export async function updateCraftStudioSettings(updates: Partial<CraftStudioSettings>): Promise<CraftStudioSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('craft_studio_settings')
+      .update(updates)
+      .single()
+      .select('*')
+
+    if (error) {
+      console.error('Error updating craft studio settings:', error)
+      return null
+    }
+    return data
+  } catch (error) {
+    console.error('Error updating craft studio settings:', error)
+    return null
   }
 }
