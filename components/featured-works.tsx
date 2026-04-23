@@ -54,13 +54,13 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
 
   return (
     <motion.div
-      className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+      className="pointer-events-none absolute inset-0 z-50"
       style={{
         borderRadius: "32px",
       }}
     >
       <motion.div
-        className="flex items-center justify-center rounded-full bg-foreground px-4 py-2"
+        className="text-3xl"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
@@ -74,9 +74,7 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
         }}
         transition={{ duration: 0.2 }}
       >
-        <span className="text-sm font-medium text-background whitespace-nowrap">
-          View Project
-        </span>
+        👆
       </motion.div>
     </motion.div>
   )
