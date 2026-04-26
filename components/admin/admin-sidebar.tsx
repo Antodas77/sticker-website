@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, FolderOpen, MessageSquare, Zap, LogOut, Shield, Info } from "lucide-react"
+import { LayoutDashboard, FolderOpen, MessageSquare, Zap, LogOut, Shield, Info, Layers, Layout, Mail } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 import {
@@ -25,6 +25,8 @@ const NAV_ITEMS = [
   { title: "Testimonials", href: "/admin/testimonials", icon: MessageSquare },
   { title: "Hero Section", href: "/admin/hero", icon: Zap },
   { title: "About Page", href: "/admin/about", icon: Info },
+  { title: "Global Branding", href: "/admin/branding", icon: Layers },
+  { title: "Footer Settings", href: "/admin/footer", icon: Layout },
 ]
 
 export function AdminSidebar() {

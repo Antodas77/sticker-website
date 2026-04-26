@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp } from "lucide-react"
+import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Layers, Layout, Info, Mail } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -73,6 +73,24 @@ export default function AdminDashboardPage() {
       color: "text-amber-500",
       bg: "bg-amber-500/10",
     },
+    {
+      title: "Global Branding",
+      icon: Layers,
+      href: "/admin/branding",
+      value: "1",
+      sub: "Logo · Label · Link",
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      title: "Footer",
+      icon: Layout,
+      href: "/admin/footer",
+      value: "1",
+      sub: "Bio · Socials · Copyright",
+      color: "text-orange-500",
+      bg: "bg-orange-500/10",
+    },
   ]
 
   return (
@@ -129,6 +147,24 @@ export default function AdminDashboardPage() {
             description: "Update the headline, CTA buttons and badge text.",
             href: "/admin/hero",
             icon: Zap,
+          },
+          {
+            title: "About Page",
+            description: "Update your bio, stats, services, and resume link.",
+            href: "/admin/about",
+            icon: Info,
+          },
+          {
+            title: "Global Branding",
+            description: "Set the nav logo type — text, image, or animated GIF.",
+            href: "/admin/branding",
+            icon: Layers,
+          },
+          {
+            title: "Footer Settings",
+            description: "Customize the 'Say hello' section, bio, and social links.",
+            href: "/admin/footer",
+            icon: Layout,
           },
         ].map((action) => (
           <Card key={action.href} className="group hover:border-primary/50 transition-colors">

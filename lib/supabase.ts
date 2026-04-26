@@ -1,25 +1,30 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+/**
+ * Browser Supabase client — uses @supabase/ssr so the session is stored
+ * in cookies (not just localStorage). This makes the session readable
+ * by Next.js middleware for server-side auth guards.
+ */
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
 
 // Types
 export interface HeroData {
   id: string
   heading: string
-  headingHighlight: string
+  heading_highlight: string
   subheading: string
-  badgeText: string
-  ctaPrimary: string
-  ctaPrimaryLink: string
-  ctaSecondary: string
-  ctaSecondaryLink: string
+  badge_text: string
+  cta_primary: string
+  cta_primary_link: string
+  cta_secondary: string
+  cta_secondary_link: string
   about_image?: string
   created_at: string
   updated_at: string
@@ -70,6 +75,33 @@ export interface Testimonial {
   image: string | null
   featured: boolean
   order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface GlobalBranding {
+  id: string
+  brand_type: 'text' | 'image' | 'gif'
+  media_url: string | null
+  static_poster_url: string | null
+  label_text: string
+  link_dest: string
+  gif_loop: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface FooterSettings {
+  id: string
+  heading: string
+  description: string
+  email: string
+  location: string
+  instagram_url: string | null
+  linkedin_url: string | null
+  youtube_url: string | null
+  substack_url: string | null
+  copyright_text: string
   created_at: string
   updated_at: string
 }
@@ -164,5 +196,65 @@ export async function getTestimonials(): Promise<Testimonial[]> {
   } catch (error) {
     console.error('Error fetching testimonials:', error)
     return []
+  }
+}
+
+export async function getGlobalBranding(): Promise<GlobalBranding | null> {
+  try {
+    const { data, error } = await supabase
+      .from('global_branding')
+      .select('*')
+      .single()
+    if (error) {
+      console.error('Error fetching global branding:', error)
+      return null
+    }
+    return data as GlobalBranding
+  } catch (error) {
+    console.error('Error fetching global branding:', error)
+    return null
+  }
+}
+
+export async function updateGlobalBranding(
+  id: string,
+  updates: Partial<Omit<GlobalBranding, 'id' | 'created_at' | 'updated_at'>>
+): Promise<GlobalBranding | null> {
+  try {
+    const { data, error } = await supabase
+      .from('global_branding')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) {
+      console.error('Error updating global branding:', error)
+      return null
+    }
+    return data as GlobalBranding
+  } catch (error) {
+    console.error('Error updating global branding:', error)
+    return null
+  }
+}
+
+export async function getFooterSettings(): Promise<FooterSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('footer_settings')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+    if (error) {
+      console.error('Error fetching footer settings:', error)
+      return null
+    }
+    if (data && data.length > 0) {
+      return data[0] as FooterSettings
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching footer settings:', error)
+    return null
   }
 }

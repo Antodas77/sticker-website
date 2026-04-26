@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { MenuOverlay } from "@/components/menu-overlay"
+import { Footer } from "@/components/footer"
 import Link from "next/link"
 import { motion, AnimatePresence, LayoutGroup, useMotionValue, useSpring } from "framer-motion"
 import { getAllProjects } from "@/lib/supabase"
@@ -11,10 +12,6 @@ import type { Project } from "@/lib/supabase"
 function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: React.RefObject<HTMLElement | null> }) {
   const cursorX = useMotionValue(0)
   const cursorY = useMotionValue(0)
-
-  const springConfig = { damping: 25, stiffness: 300 }
-  const cursorXSpring = useSpring(cursorX, springConfig)
-  const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -42,8 +39,8 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
       <motion.div
         className="flex items-center justify-center rounded-full bg-foreground px-4 py-2"
         style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
+          x: cursorX,
+          y: cursorY,
           translateX: "-50%",
           translateY: "-50%",
         }}
@@ -82,7 +79,7 @@ function ProjectCardWrapper({ project }: { project: Project }) {
         href={project.link}
         target="_blank"
         rel="noopener noreferrer"
-        className="block"
+        className="block cursor-none"
       >
         {/* Project Image */}
         <div className="aspect-[4/3] relative overflow-hidden">
@@ -158,29 +155,32 @@ export default function WorksPage() {
     <main className="min-h-screen bg-background">
       <MenuOverlay />
 
-      {/* Header */}
-      <header className="px-6 md:px-12 pt-8 pb-4">
-        <Link
-          href="/"
-          className="text-foreground font-medium tracking-tight text-lg hover:opacity-70 transition-opacity"
-        >
-          Craft Studio
-        </Link>
-      </header>
+
 
       {/* Page Title */}
-      <section className="px-6 md:px-12 py-12 md:py-16">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight text-balance">
-          Selected Works
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-          A curated collection of projects spanning design, development, and beyond.
-        </p>
+      <section className="px-6 md:px-12 pt-32 pb-12 md:pb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight text-balance">
+            Selected Works
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-xl">
+            A curated collection of projects spanning design, development, and beyond.
+          </p>
+        </motion.div>
       </section>
 
       {/* Filter Bar */}
       <nav className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="px-6 md:px-12 py-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="px-6 md:px-12 py-4"
+        >
           <LayoutGroup>
             <ul className="flex items-center gap-2 overflow-x-auto no-scrollbar">
               {categories.map((category) => {
@@ -227,7 +227,7 @@ export default function WorksPage() {
               })}
             </ul>
           </LayoutGroup>
-        </div>
+        </motion.div>
       </nav>
 
       {/* Project Grid */}
@@ -313,6 +313,8 @@ export default function WorksPage() {
           </div>
         </section>
       )}
+
+      <Footer />
     </main>
   )
 }

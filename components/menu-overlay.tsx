@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { Grid2x2 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { BrandLogo } from "@/components/brand-logo"
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -24,10 +25,14 @@ export function MenuOverlay() {
   const handleLinkClick = (href: string) => {
     setIsOpen(false)
     if (href.startsWith("#")) {
+      // Small timeout to allow the menu closing animation to start
       setTimeout(() => {
         const element = document.querySelector(href)
-        element?.scrollIntoView({ behavior: "smooth" })
-      }, 300)
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY
+          window.scrollTo({ top: y, behavior: "smooth" })
+        }
+      }, 100)
     }
   }
 
@@ -35,15 +40,8 @@ export function MenuOverlay() {
     <>
       {/* Fixed Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-5">
-        {/* Minimalist Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-foreground flex items-center justify-center rounded-sm">
-            <span className="text-background font-bold text-xs">CS</span>
-          </div>
-          <span className="text-sm font-medium text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            Craft Studio
-          </span>
-        </Link>
+        {/* Dynamic Brand Logo */}
+        <BrandLogo />
 
         {/* Navigation buttons */}
         <div className="flex items-center gap-2">

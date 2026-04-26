@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Craft Studio - Build Beautiful Products',
+  title: "Steve's Website",
   description: 'We craft beautiful digital experiences that inspire and engage users worldwide.',
   generator: 'v0.app',
   icons: {

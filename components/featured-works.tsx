@@ -12,29 +12,10 @@ export interface ProjectData {
   role?: string
 }
 
-// Default projects for when data is not available
-const defaultProjects: ProjectData[] = [
-  {
-    title: "Aurora Dashboard",
-    category: "Web Application",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&h=1000&fit=crop&q=80",
-    link: "https://example.com/aurora-dashboard",
-  },
-  {
-    title: "Meridian Brand",
-    category: "Brand Identity",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&h=1000&fit=crop&q=80",
-    link: "https://example.com/aurora-dashboard",
-  },
-]
 
 function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: React.RefObject<HTMLElement | null> }) {
   const cursorX = useMotionValue(0)
   const cursorY = useMotionValue(0)
-
-  const springConfig = { damping: 25, stiffness: 300 }
-  const cursorXSpring = useSpring(cursorX, springConfig)
-  const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -62,8 +43,8 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
       <motion.div
         className="flex items-center justify-center rounded-full bg-foreground px-4 py-2"
         style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
+          x: cursorX,
+          y: cursorY,
           translateX: "-50%",
           translateY: "-50%",
         }}
@@ -122,7 +103,7 @@ function ProjectCard({
         href={project.link}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative w-full block"
+        className="group relative w-full block cursor-none"
         style={{ borderRadius: "32px" }}
         whileHover={{ y: -8 }}
         transition={{ duration: 0.3 }}
@@ -154,11 +135,8 @@ function ProjectCard({
 
         {/* Minimalist text label container */}
         <div className="mt-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
-          {/* Left Side: Number + Title */}
-          <div className="flex gap-4 md:gap-8 items-baseline">
-            <span className="text-sm font-medium text-muted-foreground tabular-nums">
-              Project {String(index + 1).padStart(2, '0')}
-            </span>
+          {/* Left Side: Title */}
+          <div className="flex items-baseline">
             <h3 className="text-2xl md:text-4xl font-semibold text-foreground group-hover:text-accent transition-colors tracking-tight">
               {project.title}
             </h3>
@@ -190,7 +168,8 @@ interface FeaturedWorksProps {
 export function FeaturedWorks({ projects }: FeaturedWorksProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const projectsToShow = projects && projects.length > 0 ? projects : defaultProjects
+  
+  if (!projects || projects.length === 0) return null
 
   return (
     <section ref={sectionRef} className="relative px-4 md:px-8 py-24">
@@ -205,7 +184,7 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {projectsToShow.map((project, index) => (
+          {projects.map((project, index) => (
             <ProjectCard
               key={index}
               project={project}

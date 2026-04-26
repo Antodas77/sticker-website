@@ -10,58 +10,48 @@ import { AnimatePresence } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import type { AboutContent } from "@/lib/supabase"
 
-const DEFAULT_ABOUT: AboutContent = {
-  id: "",
-  hero_subtitle: "Crafting digital experiences that resonate.",
-  philosophy_heading: "Our Philosophy",
-  philosophy_text_1:
-    "We believe that great design is invisible. It guides users naturally, creating experiences that feel intuitive and effortless. Our approach combines strategic thinking with meticulous craftsmanship.",
-  philosophy_text_2:
-    "Founded in 2018, Craft Studio emerged from a simple idea: that digital products should be as thoughtfully designed as the physical objects we cherish. We bring the same care and attention to every pixel, every interaction, and every line of code.",
-  philosophy_text_3:
-    "Our team of designers, developers, and strategists work collaboratively to solve complex challenges. We partner with forward-thinking companies who understand that design is a competitive advantage.",
-  stat_1_label: "Years Experience",
-  stat_1_value: "8+",
-  stat_2_label: "Projects Delivered",
-  stat_2_value: "120+",
-  stat_3_label: "Happy Clients",
-  stat_3_value: "85+",
-  stat_4_label: "Awards Won",
-  stat_4_value: "12",
-  services:
-    "Brand Identity & Strategy,UI/UX Design,Web Development,Design Systems,Motion Design,Creative Direction",
-  location: "San Francisco, CA",
-  founded: "2018",
-  team_size: "12 Creatives",
-  resume_url: "",
-}
-
-const DEFAULT_ABOUT_IMAGE =
-  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&h=700&fit=crop"
-
 export default function AboutPage() {
-  const [about, setAbout] = useState<AboutContent>(DEFAULT_ABOUT)
-  const [aboutImage, setAboutImage] = useState(DEFAULT_ABOUT_IMAGE)
+  const [about, setAbout] = useState<AboutContent | null>(null)
+  const [aboutImage, setAboutImage] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch about page text
-    supabase
-      .from("about_content")
-      .select("*")
-      .single()
-      .then(({ data }) => {
-        if (data) setAbout(data as AboutContent)
-      })
-
-    // Fetch about image from hero_content
-    supabase
-      .from("hero_content")
-      .select("about_image")
-      .single()
-      .then(({ data }) => {
-        if (data?.about_image) setAboutImage(data.about_image)
-      })
+    Promise.all([
+      supabase.from("about_content").select("*").single(),
+      supabase.from("hero_content").select("about_image").single(),
+    ]).then(([aboutRes, imageRes]) => {
+      if (aboutRes.data) setAbout(aboutRes.data as AboutContent)
+      if (imageRes.data?.about_image) setAboutImage(imageRes.data.about_image)
+      setLoading(false)
+    })
   }, [])
+
+  if (loading) {
+    return (
+      <main className="min-h-screen">
+        <MenuOverlay />
+        <section className="pt-32 pb-12 px-6 md:px-12">
+          <div className="max-w-6xl mx-auto space-y-6">
+            <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+            <div className="h-24 w-3/4 bg-muted animate-pulse rounded-xl" />
+            <div className="space-y-4">
+              <div className="h-6 w-full bg-muted animate-pulse rounded" />
+              <div className="h-6 w-full bg-muted animate-pulse rounded" />
+              <div className="h-6 w-4/5 bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        </section>
+        <section className="px-6 md:px-12 pb-20">
+          <div className="max-w-6xl mx-auto">
+            <div className="w-full aspect-[21/9] bg-muted animate-pulse rounded-2xl" />
+          </div>
+        </section>
+        <Footer />
+      </main>
+    )
+  }
+
+  if (!about) return null
 
   const stats = [
     { label: about.stat_1_label, value: about.stat_1_value },
@@ -103,24 +93,26 @@ export default function AboutPage() {
       </section>
 
       {/* Full-Width Image */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="px-6 md:px-12 pb-20"
-      >
-        <div className="max-w-6xl mx-auto">
-          <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-card">
-            <Image
-              src={aboutImage}
-              alt="Behind the work"
-              fill
-              className="object-cover"
-              priority
-            />
+      {aboutImage && (
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="px-6 md:px-12 pb-20"
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-card">
+              <Image
+                src={aboutImage}
+                alt="Behind the work"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
-        </div>
-      </motion.section>
+        </motion.section>
+      )}
 
       {/* Approach Section */}
       <section className="px-6 md:px-12 py-20 border-t border-border">
@@ -274,7 +266,8 @@ function ResumeSection({ resumeUrl }: { resumeUrl: string }) {
             </button>
             <a
               href={resumeUrl}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Download className="h-4 w-4" />

@@ -3,21 +3,22 @@ import { FeaturedWorks } from "@/components/featured-works"
 import { Testimonials } from "@/components/testimonials"
 import { Footer } from "@/components/footer"
 import { MenuOverlay } from "@/components/menu-overlay"
-import { getFeaturedProjects, getTestimonials, getHeroData } from "@/lib/supabase"
+import { getFeaturedProjects, getTestimonials, getHeroData, getFooterSettings } from "@/lib/supabase"
 
 export default async function Home() {
   try {
-    const [featuredProjects, testimonials, heroData] = await Promise.all([
+    const [featuredProjects, testimonials, heroData, footerData] = await Promise.all([
       getFeaturedProjects(),
       getTestimonials(),
       getHeroData(),
+      getFooterSettings(),
     ])
 
     // Transform Supabase data to match component props
     const projectsData = featuredProjects.map((project) => ({
       title: project.title,
       category: project.category || 'Project',
-      image: project.image || '',
+      image: project.image || "",
       link: project.link || '#',
     }))
 
@@ -25,7 +26,7 @@ export default async function Home() {
       name: t.name,
       role: t.role,
       content: t.quote,
-      avatar: t.image || '',
+      avatar: t.image || "",
     }))
 
     return (
@@ -34,7 +35,7 @@ export default async function Home() {
         <Hero data={heroData} />
         <FeaturedWorks projects={projectsData} />
         <Testimonials testimonials={testimonialsData} />
-        <Footer />
+        <Footer data={footerData} />
       </main>
     )
   } catch (error) {
@@ -47,7 +48,7 @@ export default async function Home() {
         <Hero data={null} />
         <FeaturedWorks projects={undefined} />
         <Testimonials testimonials={undefined} />
-        <Footer />
+        <Footer data={null} />
       </main>
     )
   }

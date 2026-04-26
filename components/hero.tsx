@@ -24,13 +24,13 @@ const defaults = {
 
 export function Hero({ data }: HeroProps) {
   const heading = data?.heading || defaults.heading
-  const headingHighlight = data?.headingHighlight || defaults.headingHighlight
+  const headingHighlight = data?.heading_highlight || defaults.headingHighlight
   const subheading = data?.subheading || defaults.subheading
-  const badgeText = data?.badgeText || defaults.badgeText
-  const ctaPrimary = data?.ctaPrimary || defaults.ctaPrimary
-  const ctaPrimaryLink = data?.ctaPrimaryLink || defaults.ctaPrimaryLink
-  const ctaSecondary = data?.ctaSecondary || defaults.ctaSecondary
-  const ctaSecondaryLink = data?.ctaSecondaryLink || defaults.ctaSecondaryLink
+  const badgeText = data?.badge_text || defaults.badgeText
+  const ctaPrimary = data?.cta_primary || defaults.ctaPrimary
+  const ctaPrimaryLink = data?.cta_primary_link || defaults.ctaPrimaryLink
+  const ctaSecondary = data?.cta_secondary || defaults.ctaSecondary
+  const ctaSecondaryLink = data?.cta_secondary_link || defaults.ctaSecondaryLink
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
       {/* Subtle grid background */}
