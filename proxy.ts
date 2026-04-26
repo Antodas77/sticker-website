@@ -10,7 +10,7 @@ import { createServerClient } from "@supabase/ssr"
  *
  * Runs BEFORE any page renders — no client-side JS required.
  */
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Only guard /admin routes
