@@ -25,7 +25,7 @@ export function Hero({ data }: HeroProps) {
   const heading = data?.heading || defaults.heading
   const headingHighlight = data?.heading_highlight || defaults.headingHighlight
   const subheading = data?.subheading || defaults.subheading
-  const badgeText = data?.badge_text || defaults.badgeText
+  const badgeText = data?.badge_text ?? defaults.badgeText
   const ctaPrimary = data?.cta_primary || defaults.ctaPrimary
   const ctaPrimaryLink = data?.cta_primary_link || defaults.ctaPrimaryLink
   const ctaSecondary = data?.cta_secondary || defaults.ctaSecondary
@@ -60,10 +60,9 @@ export function Hero({ data }: HeroProps) {
         />
       )}
 
-      {/* Overlay for readability when background media is active */}
-      {hasBg && (
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
-      )}
+
+      {/* No overlay — media renders at full original clarity */}
+
 
       {/* Decorative grid + orbs — only when no background media */}
       {!hasBg && (
@@ -75,15 +74,17 @@ export function Hero({ data }: HeroProps) {
       )}
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card/50 backdrop-blur-sm mb-8"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-sm text-muted-foreground">{badgeText}</span>
-        </motion.div>
+        {badgeText && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card/50 backdrop-blur-sm mb-8"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-sm text-muted-foreground">{badgeText}</span>
+          </motion.div>
+        )}
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}

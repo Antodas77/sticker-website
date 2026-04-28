@@ -49,7 +49,7 @@ const heroSchema = z.object({
   heading: z.string().min(1, "Heading is required"),
   heading_highlight: z.string().min(1, "Heading highlight is required"),
   subheading: z.string().min(1, "Subheading is required"),
-  badge_text: z.string().min(1, "Badge text is required"),
+  badge_text: z.string(),
   cta_primary: z.string().min(1, "Primary CTA label is required"),
   cta_primary_link: z.string().min(1, "Primary CTA link is required"),
   cta_secondary: z.string().min(1, "Secondary CTA label is required"),
