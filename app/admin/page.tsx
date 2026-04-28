@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Layers, Layout, Info, Mail } from "lucide-react"
+import { FolderOpen, MessageSquare, Zap, ArrowRight, TrendingUp, Layers, Layout, Info, Mail, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -91,6 +91,15 @@ export default function AdminDashboardPage() {
       color: "text-orange-500",
       bg: "bg-orange-500/10",
     },
+    {
+      title: "Page Content",
+      icon: FileText,
+      href: "/admin/pages",
+      value: "1",
+      sub: "Home · Works headings",
+      color: "text-sky-500",
+      bg: "bg-sky-500/10",
+    },
   ]
 
   return (
@@ -165,6 +174,12 @@ export default function AdminDashboardPage() {
             description: "Customize the 'Say hello' section, bio, and social links.",
             href: "/admin/footer",
             icon: Layout,
+          },
+          {
+            title: "Page Content",
+            description: "Edit headings and descriptions on the Home and Works pages.",
+            href: "/admin/pages",
+            icon: FileText,
           },
         ].map((action) => (
           <Card key={action.href} className="group hover:border-primary/50 transition-colors">

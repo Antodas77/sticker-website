@@ -4,15 +4,16 @@ import { FeaturedWorks } from "@/components/featured-works"
 import { Testimonials } from "@/components/testimonials"
 import { Footer } from "@/components/footer"
 import { MenuOverlay } from "@/components/menu-overlay"
-import { getFeaturedProjects, getTestimonials, getHeroData, getFooterSettings } from "@/lib/supabase"
+import { getFeaturedProjects, getTestimonials, getHeroData, getFooterSettings, getPageContent } from "@/lib/supabase"
 
 export default async function Home() {
   try {
-    const [featuredProjects, testimonials, heroData, footerData] = await Promise.all([
+    const [featuredProjects, testimonials, heroData, footerData, pageContent] = await Promise.all([
       getFeaturedProjects(),
       getTestimonials(),
       getHeroData(),
       getFooterSettings(),
+      getPageContent(),
     ])
 
     // Transform Supabase data to match component props
@@ -34,7 +35,11 @@ export default async function Home() {
       <main className="min-h-screen">
         <MenuOverlay />
         <Hero data={heroData} />
-        <FeaturedWorks projects={projectsData} />
+        <FeaturedWorks
+          projects={projectsData}
+          heading={pageContent?.featured_works_heading}
+          subheading={pageContent?.featured_works_subheading}
+        />
         <Testimonials testimonials={testimonialsData} />
         <Footer data={footerData} />
       </main>

@@ -10,7 +10,6 @@ interface HeroProps {
   data?: HeroData | null
 }
 
-// Default values for when Sanity data is not available
 const defaults = {
   heading: "Build Products",
   headingHighlight: "That Inspire",
@@ -31,14 +30,49 @@ export function Hero({ data }: HeroProps) {
   const ctaPrimaryLink = data?.cta_primary_link || defaults.ctaPrimaryLink
   const ctaSecondary = data?.cta_secondary || defaults.ctaSecondary
   const ctaSecondaryLink = data?.cta_secondary_link || defaults.ctaSecondaryLink
+
+  const bgType = data?.hero_bg_type ?? "none"
+  const bgUrl = data?.hero_bg_url ?? null
+  const hasBg = bgType !== "none" && !!bgUrl
+
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
-      {/* Subtle grid background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
-      {/* Gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-muted/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-muted/10 rounded-full blur-3xl" />
+      {/* ── Background media ── */}
+      {hasBg && bgType === "video" && (
+        <video
+          key={bgUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src={bgUrl!} />
+        </video>
+      )}
+      {hasBg && (bgType === "image" || bgType === "gif") && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={bgUrl!}
+          alt="Hero background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
+      {/* Overlay for readability when background media is active */}
+      {hasBg && (
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+      )}
+
+      {/* Decorative grid + orbs — only when no background media */}
+      {!hasBg && (
+        <>
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-muted/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-muted/10 rounded-full blur-3xl" />
+        </>
+      )}
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         <motion.div
@@ -48,9 +82,7 @@ export function Hero({ data }: HeroProps) {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card/50 backdrop-blur-sm mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-sm text-muted-foreground">
-            {badgeText}
-          </span>
+          <span className="text-sm text-muted-foreground">{badgeText}</span>
         </motion.div>
 
         <motion.h1

@@ -6,8 +6,8 @@ import { MenuOverlay } from "@/components/menu-overlay"
 import { Footer } from "@/components/footer"
 import Link from "next/link"
 import { motion, AnimatePresence, LayoutGroup, useMotionValue, useSpring } from "framer-motion"
-import { getAllProjects } from "@/lib/supabase"
-import type { Project } from "@/lib/supabase"
+import { getAllProjects, getPageContent } from "@/lib/supabase"
+import type { Project, PageContent } from "@/lib/supabase"
 
 function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: React.RefObject<HTMLElement | null> }) {
   const cursorX = useMotionValue(0)
@@ -17,8 +17,8 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
     const handleMouseMove = (e: MouseEvent) => {
       if (cardRef.current) {
         const rect = cardRef.current.getBoundingClientRect()
-        cursorX.set(e.clientX - rect.left)
-        cursorY.set(e.clientY - rect.top)
+        cursorX.set(e.clientX - rect.left - rect.width / 2)
+        cursorY.set(e.clientY - rect.top - rect.height / 2)
       }
     }
 
@@ -132,10 +132,15 @@ export default function WorksPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState("All")
+  const [pageContent, setPageContent] = useState<PageContent | null>(null)
 
   useEffect(() => {
-    getAllProjects().then((data) => {
+    Promise.all([
+      getAllProjects(),
+      getPageContent(),
+    ]).then(([data, content]) => {
       setProjects(data)
+      setPageContent(content)
       setLoading(false)
     })
   }, [])
@@ -165,10 +170,10 @@ export default function WorksPage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight text-balance">
-            Selected Works
+            {pageContent?.works_page_heading ?? ''}
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-            A curated collection of projects spanning design, development, and beyond.
+            {pageContent?.works_page_subheading ?? ''}
           </p>
         </motion.div>
       </section>

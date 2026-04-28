@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ImageUploader } from "@/components/admin/image-uploader"
+import { MediaUploader } from "@/components/admin/media-uploader"
 
 interface HeroContent {
   id: string
@@ -40,6 +41,8 @@ interface HeroContent {
   cta_secondary: string
   cta_secondary_link: string
   about_image: string | null
+  hero_bg_type: 'none' | 'image' | 'gif' | 'video'
+  hero_bg_url: string | null
 }
 
 const heroSchema = z.object({
@@ -59,6 +62,8 @@ export default function HeroPage() {
   const [heroId, setHeroId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [bgType, setBgType] = useState<'none' | 'image' | 'gif' | 'video'>('none')
+  const [bgUrl, setBgUrl] = useState<string>('')
 
   const form = useForm<HeroFormValues>({
     resolver: zodResolver(heroSchema),
@@ -86,6 +91,8 @@ export default function HeroPage() {
       } else if (data) {
         const hero = data as HeroContent
         setHeroId(hero.id)
+        setBgType(hero.hero_bg_type ?? 'none')
+        setBgUrl(hero.hero_bg_url ?? '')
         form.reset({
           heading: hero.heading,
           heading_highlight: hero.heading_highlight,
@@ -109,7 +116,12 @@ export default function HeroPage() {
 
     const { error } = await supabase
       .from("hero_content")
-      .update({ ...values, updated_at: new Date().toISOString() })
+      .update({
+        ...values,
+        hero_bg_type: bgType,
+        hero_bg_url: bgUrl.trim() || null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", heroId)
 
     if (error) {
@@ -283,6 +295,70 @@ export default function HeroPage() {
                     </FormItem>
                   )}
                 />
+              </CardContent>
+            </Card>
+
+            {/* Background Media */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Background Media</CardTitle>
+                <CardDescription>
+                  Optional full-screen background behind the hero text. Choose a type then paste a public URL.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Type selector */}
+                <div className="flex flex-wrap gap-2">
+                  {(['none', 'image', 'gif', 'video'] as const).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setBgType(t)}
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                        bgType === t
+                          ? 'bg-foreground text-background border-foreground'
+                          : 'border-border text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {t === 'none' ? 'None' : t === 'image' ? 'Image' : t === 'gif' ? 'GIF' : 'Video'}
+                    </button>
+                  ))}
+                </div>
+
+                {bgType !== 'none' && (
+                  <div className="space-y-4">
+                    {/* Drag-and-drop uploader */}
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        {bgType === 'video' ? 'Upload Video' : bgType === 'gif' ? 'Upload GIF' : 'Upload Image'}
+                      </label>
+                      <MediaUploader
+                        value={bgUrl}
+                        onChange={setBgUrl}
+                        mediaType={bgType}
+                        bucket="images"
+                        folder="hero-bg"
+                      />
+                    </div>
+
+                    {/* OR: paste a URL */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-xs text-muted-foreground">or paste a URL</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                    <input
+                      type="url"
+                      value={bgUrl}
+                      onChange={(e) => setBgUrl(e.target.value)}
+                      placeholder={bgType === 'video' ? 'https://…/bg.mp4' : 'https://…/bg.jpg'}
+                      className="w-full bg-transparent border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-foreground transition-colors"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Upload a file above or paste a public URL. Videos: MP4/WebM up to 100 MB.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

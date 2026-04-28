@@ -99,43 +99,30 @@ function ProjectCard({
         isVisible={isHovered}
         cardRef={cardRef}
       />
-      <motion.a
+      <a
         href={project.link}
         target="_blank"
         rel="noopener noreferrer"
         className="group relative w-full block cursor-none"
         style={{ borderRadius: "0" }}
-        whileHover={{ y: -8 }}
-        transition={{ duration: 0.3 }}
       >
-        {/* Image container with zoom effect */}
+        {/* Image container */}
         <div className="relative aspect-[4/3] w-full overflow-hidden" style={{ borderRadius: "32px" }}>
-          <motion.div
-            className="absolute inset-0"
-            animate={{ scale: isHovered ? 1.08 : 1 }}
-            transition={{ duration: 0.7, ease: [0.33, 1, 0.68, 1] }}
-          >
-            <Image
-              src={project.image}
-              alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-            {/* Subtle overlay on hover */}
-            <motion.div
-              className="absolute inset-0 bg-black/20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.div>
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Text label container — rounded bottom corners */}
         <div
-          className="mt-3 flex flex-col md:flex-row md:items-start justify-between gap-4 bg-card border border-border px-5 py-5"
+          className="mt-3 flex flex-col md:flex-row md:items-start justify-between gap-4 px-5 py-5"
           style={{ borderRadius: "0 0 32px 32px" }}
         >
           {/* Left Side: Title */}
@@ -159,16 +146,18 @@ function ProjectCard({
             </motion.div>
           </div>
         </div>
-      </motion.a>
+      </a>
     </div>
   )
 }
 
 interface FeaturedWorksProps {
   projects?: ProjectData[]
+  heading?: string
+  subheading?: string
 }
 
-export function FeaturedWorks({ projects }: FeaturedWorksProps) {
+export function FeaturedWorks({ projects, heading, subheading }: FeaturedWorksProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   
@@ -179,10 +168,10 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
       <div className="mx-auto max-w-7xl">
         <div className="mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Featured Works
+            {heading}
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl">
-            Selected projects showcasing our expertise in design and development.
+            {subheading}
           </p>
         </div>
 

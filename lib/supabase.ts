@@ -26,6 +26,8 @@ export interface HeroData {
   cta_secondary: string
   cta_secondary_link: string
   about_image?: string
+  hero_bg_type?: 'none' | 'image' | 'gif' | 'video'
+  hero_bg_url?: string | null
   created_at: string
   updated_at: string
 }
@@ -102,6 +104,16 @@ export interface FooterSettings {
   youtube_url: string | null
   substack_url: string | null
   copyright_text: string
+  created_at: string
+  updated_at: string
+}
+
+export interface PageContent {
+  id: string
+  featured_works_heading: string
+  featured_works_subheading: string
+  works_page_heading: string
+  works_page_subheading: string
   created_at: string
   updated_at: string
 }
@@ -255,6 +267,45 @@ export async function getFooterSettings(): Promise<FooterSettings | null> {
     return null
   } catch (error) {
     console.error('Error fetching footer settings:', error)
+    return null
+  }
+}
+
+export async function getPageContent(): Promise<PageContent | null> {
+  try {
+    const { data, error } = await supabase
+      .from('page_content')
+      .select('*')
+      .single()
+    if (error) {
+      console.error('Error fetching page content:', error)
+      return null
+    }
+    return data as PageContent
+  } catch (error) {
+    console.error('Error fetching page content:', error)
+    return null
+  }
+}
+
+export async function updatePageContent(
+  id: string,
+  updates: Partial<Omit<PageContent, 'id' | 'created_at' | 'updated_at'>>
+): Promise<PageContent | null> {
+  try {
+    const { data, error } = await supabase
+      .from('page_content')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) {
+      console.error('Error updating page content:', error)
+      return null
+    }
+    return data as PageContent
+  } catch (error) {
+    console.error('Error updating page content:', error)
     return null
   }
 }
