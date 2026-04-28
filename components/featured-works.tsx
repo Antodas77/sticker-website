@@ -21,8 +21,8 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
     const handleMouseMove = (e: MouseEvent) => {
       if (cardRef.current) {
         const rect = cardRef.current.getBoundingClientRect()
-        cursorX.set(e.clientX - rect.left)
-        cursorY.set(e.clientY - rect.top)
+        cursorX.set(e.clientX - rect.left - rect.width / 2)
+        cursorY.set(e.clientY - rect.top - rect.height / 2)
       }
     }
 
@@ -37,7 +37,7 @@ function CursorFollower({ isVisible, cardRef }: { isVisible: boolean; cardRef: R
     <motion.div
       className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
       style={{
-        borderRadius: "32px",
+        borderRadius: "0",
       }}
     >
       <motion.div
@@ -91,7 +91,7 @@ function ProjectCard({
     <div
       ref={cardRef}
       className="group relative w-full cursor-none overflow-hidden"
-      style={{ borderRadius: "32px" }}
+      style={{ borderRadius: "0" }}
       onMouseEnter={handleHoverStart}
       onMouseLeave={handleHoverEnd}
     >
@@ -104,7 +104,7 @@ function ProjectCard({
         target="_blank"
         rel="noopener noreferrer"
         className="group relative w-full block cursor-none"
-        style={{ borderRadius: "32px" }}
+        style={{ borderRadius: "0" }}
         whileHover={{ y: -8 }}
         transition={{ duration: 0.3 }}
       >
@@ -133,15 +133,18 @@ function ProjectCard({
           </motion.div>
         </div>
 
-        {/* Minimalist text label container */}
-        <div className="mt-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
+        {/* Text label container — rounded bottom corners */}
+        <div
+          className="mt-3 flex flex-col md:flex-row md:items-start justify-between gap-4 bg-card border border-border px-5 py-5"
+          style={{ borderRadius: "0 0 32px 32px" }}
+        >
           {/* Left Side: Title */}
           <div className="flex items-baseline">
             <h3 className="text-2xl md:text-4xl font-semibold text-foreground group-hover:text-accent transition-colors tracking-tight">
               {project.title}
             </h3>
           </div>
-          
+
           {/* Right Side: Role/Type + Arrow */}
           <div className="flex items-center gap-6 justify-between w-full md:w-auto">
             <p className="text-muted-foreground text-sm md:text-base font-medium">

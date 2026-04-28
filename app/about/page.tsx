@@ -26,6 +26,20 @@ export default function AboutPage() {
     })
   }, [])
 
+  // Scroll to hash anchor after data loads (e.g. /about#resume)
+  useEffect(() => {
+    if (!loading && window.location.hash) {
+      const el = document.querySelector(window.location.hash)
+      if (el) {
+        setTimeout(() => {
+          const navbarHeight = 80
+          const y = el.getBoundingClientRect().top + window.scrollY - navbarHeight
+          window.scrollTo({ top: y, behavior: "smooth" })
+        }, 300)
+      }
+    }
+  }, [loading])
+
   if (loading) {
     return (
       <main className="min-h-screen">
@@ -245,6 +259,7 @@ function ResumeSection({ resumeUrl }: { resumeUrl: string }) {
     <>
       {/* Trigger strip */}
       <motion.section
+        id="resume"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}

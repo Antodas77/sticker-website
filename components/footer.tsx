@@ -207,7 +207,7 @@ export function Footer({ data: initialData }: FooterProps) {
               <button
                 type="submit"
                 disabled={pending}
-                className="self-start px-8 py-3 bg-foreground text-background font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="self-start px-8 py-3 bg-foreground text-background font-medium hover:opacity-90 transition-opacity disabled:opacity-50 rounded-[32px]"
                 suppressHydrationWarning
               >
                 {pending ? "Sending..." : "Send Message"}

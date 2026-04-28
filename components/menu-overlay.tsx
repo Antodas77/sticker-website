@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { Grid2x2 } from "lucide-react"
+import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { BrandLogo } from "@/components/brand-logo"
 
@@ -15,8 +15,7 @@ const navLinks = [
 ]
 
 const socialLinks = [
-  { label: "Twitter / X", href: "https://twitter.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
+  { label: "Resume", href: "/about#resume" },
 ]
 
 export function MenuOverlay() {
@@ -55,7 +54,7 @@ export function MenuOverlay() {
             aria-label="Toggle menu"
             suppressHydrationWarning
           >
-            <Grid2x2 className="w-5 h-5 text-background" />
+            <Menu className="w-5 h-5 text-background" />
           </button>
         </div>
       </header>
@@ -115,15 +114,14 @@ export function MenuOverlay() {
               {/* Social Links */}
               <nav className="space-y-2">
                 {socialLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.label}
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => setIsOpen(false)}
                     className="block text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
               </nav>
             </motion.div>
